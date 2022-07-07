@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+{% block title %} Let's Quiz | Submission Result {% endblock title %}
+{% block content %}
+{% for attempted in attempts%}
+<div class="container">
+	<div class="jumbotron my-4">
+
+	   	<h3 class="text-info">{{ attempted.question.html|safe }}</h3>
+        <h4> <span class="badge bg-secondary">{{ attempted.question.categorie.nom|safe }}</span></h4>
+
+		<p>
+		    <strong>Your answer: </strong>
+		    {{ attempted.selected_choice.html|safe }}
+		</p>
+
+		{% if attempted.selected_choice.is_correct %}
+		<h4 class="text-success">Reponse correct. High Five! 🙌</h4>
+		{% else %}
+		<h4 class="text-danger">Reponse incorrect 😟</h4>
+		{% endif %}
+
+	</div>
+</div>
+{% endfor %}
+
+{% endblock content %}
