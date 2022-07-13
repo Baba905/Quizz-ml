@@ -1,3 +1,4 @@
+from re import A
 from django.db import models
 
 # Create your models here.
@@ -12,6 +13,51 @@ class Categorie(models.Model):
     def __str__(self) -> str:
         return self.nom
 
+    def questions_of_the_categorie(self):
+        return self.categories.all()
+
+    def questions_from_quizprofile(self, id_quizprofile):
+        attempts = AttemptedQuestion.objects.filter(quiz_profile=id_quizprofile)
+        questions= []
+        for attempt in attempts:
+            if attempt.question.categorie.id==self.id:
+                tmp = Question.objects.get(id = attempt.question.id)
+                questions.append(tmp)
+        return questions
+
+    
+    
+class Parcours(models.Model):
+    name = models.CharField(max_length=255)
+    categorie = models.ManyToManyField(Categorie, related_name='parcourss')
+
+    def __str__(self) -> str:
+        return self.name
+
+    def categories_of_parcours(self):
+        return list(self.categorie.all())
+
+    def questions_of_parcours(self):
+        categories = self.categories_of_parcours()
+        questions = []
+        for categorie in categories:
+            tmp =categorie.questions_of_the_categorie()
+            questions.append(tmp)
+        questions = [item for list_question in questions for item in list_question]
+        return questions
+
+    def questions_from_quizprofile(self, id_quizprofile):
+        categories = self.categories_of_parcours()
+        questions =[]
+        for categorie in categories:
+            tmp =categorie.questions_from_quizprofile(id_quizprofile)
+            if len(tmp) != 0:
+                questions.append(tmp)
+        return questions
+
+    
+    
+   
 class Question(models.Model):
     ALLOWED_NUMBER_OF_CORRECT_CHOICES = 1
 
@@ -38,18 +84,15 @@ class Choice(models.Model):
 class QuizProfile(models.Model):
     user = models.ForeignKey(User, related_name='quizprofiles',on_delete=models.CASCADE)
     total_score = models.DecimalField(_('Total Score'), default=0, decimal_places=2, max_digits=10)
+    parcours = models.ForeignKey(Parcours, null=True,on_delete=models.CASCADE, related_name= 'quizprofile')
     
-
-
     def __str__(self):
         return f'<QuizProfile: user={self.user}>'
-
-
     
-    def get_new_question(self):
+    def get_new_question(self,id_categorie):
         used_questions_pk = AttemptedQuestion.objects.filter(quiz_profile=self).values_list('question__pk', flat=True)
-        remaining_questions = Question.objects.exclude(pk__in=used_questions_pk)
-        #print(len())
+        remaining_questions = Question.objects.exclude(pk__in=used_questions_pk).filter(categorie_id=id_categorie)
+        #print(f" reste question {len(remaining_questions) }")
         if len(used_questions_pk) == NUMBER_OF_QUESTIONS :
             return 
         return random.choice(remaining_questions)
@@ -75,6 +118,20 @@ class QuizProfile(models.Model):
             models.Sum('marks_obtained'))['marks_obtained__sum']
         self.total_score = marks_sum or 0
         self.save()
+    
+    def calculation(self):
+        list_question = self.parcours.questions_from_quizprofile(self.id)
+        result = []
+
+        for questions in list_question:
+            count=0
+            for question in questions:
+                attempt = AttemptedQuestion.objects.get(quiz_profile_id =self.id, question_id= question.id)
+                if attempt.is_correct:
+                    count+=1
+            result.append([questions[0].categorie.nom,len(questions), count])
+        return result
+        
 
 
 class AttemptedQuestion(models.Model):

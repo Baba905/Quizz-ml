@@ -1,10 +1,11 @@
-from turtle import right
+from multiprocessing import context
+from random import choice
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ObjectDoesNotExist
 from django.http import Http404
-from .models import QuizProfile, Question, AttemptedQuestion
+from .models import QuizProfile, Question, AttemptedQuestion, Parcours
 from .forms import UserLoginForm, RegistrationForm
 
 
@@ -15,13 +16,14 @@ def home(request):
 
 @login_required()
 def user_home(request):
-    context = {}
+    parcours = Parcours.objects.all()
+    context = {'liste_parcours': parcours}
     return render(request, 'quiz/user_home.html', context=context)
 
 
 def leaderboard(request):
 
-    top_quiz_profiles = QuizProfile.objects.order_by('-total_score')[:500]
+    top_quiz_profiles = QuizProfile.objects.filter(user = request.user).order_by('-total_score')[:500]
     total_count = top_quiz_profiles.count()
     context = {
         'top_quiz_profiles': top_quiz_profiles,
@@ -31,8 +33,10 @@ def leaderboard(request):
 
 created = False
 @login_required()
-def play(request):
+def play(request,id_parcours):
     #quiz_profile, created = QuizProfile.objects.get_or_create(user=request.user)
+    parcours= Parcours.objects.get(id=id_parcours)
+    categories_parcours = list(parcours.categorie.all())
     global created
     if request.method == 'POST':
         quiz_profile = list(QuizProfile.objects.filter(user = request.user))[-1]
@@ -50,21 +54,25 @@ def play(request):
 
         quiz_profile.evaluate_attempt(attempted_question, selected_choice)
 
-        return redirect(attempted_question)
+        return redirect(f'/play/{id_parcours}')
 
     else:
+        
         if not created :
-            quiz_profile= QuizProfile.objects.create(user=request.user)
+            print(request.user)
+            quiz_profile= QuizProfile.objects.create(user=request.user, parcours= parcours)
             created = True
         else:
             quiz_profile = list(QuizProfile.objects.filter(user = request.user))[-1]
-        question = quiz_profile.get_new_question()
+        categorie = choice(categories_parcours)
+        question = quiz_profile.get_new_question(categorie.id)
         if question is not None:
             quiz_profile.create_attempt(question)
         else:
             created= False
         context = {
             'question': question,
+            'parcours' : parcours,
         }
 
         return render(request, 'quiz/play.html', context=context)
@@ -123,7 +131,32 @@ from django.shortcuts import render
 
 # Create your views here.
 
-def resume_test(request, quiz_profile_id):
+def resume_test(request, quiz_profile_id,):
     attempts = AttemptedQuestion.objects.filter(quiz_profile=quiz_profile_id)
-    context ={'attempts':attempts}
+    quizprofile = QuizProfile.objects.get(id= quiz_profile_id)
+    results = quizprofile.calculation()
+    tresult = []
+    percentage = []
+    for result in results:
+        tmp = f'{result[0]},   {result[2]/result[1]*100} %'
+        tresult.append(tmp)
+        percentage.append(result[2]/result[1]*100)
+    context ={
+        'attempts':attempts,
+        'results' : tresult,
+        'percent' : percentage
+    }
     return render(request, 'quiz/resume.html',context)
+
+def affiche_categories(request, id_parcours):
+    parcours =Parcours.objects.get(id = id_parcours)
+    categories = parcours.categorie.all()
+    questions=[]
+    for categorie in categories :
+        tmp = list(Question.objects.filter(categorie= categorie.id))
+        questions.append((categorie,tmp))
+    context= {
+            'categories': categories,
+            'questions' :questions
+        }
+    return render(request,'quiz/affiche.html',context)

@@ -4,17 +4,17 @@
 <div class="container my-4">
     <div class="jumbotron">
 
-	      <h2 class="text-center text-info">Congratulations!! You have successfully logged in.</h2>
-	      <h3 class="text-info text-center">Before you play the quiz, here are the rules</h3>
+	      <h2 class="text-center text-info">Toutes nos félicitations!! Vous vous êtes connecté avec succès.</h2>
+	      <h3 class="text-info text-center">Avant de jouer au quiz, voici les règles</h3>
 
         <div class="row">
 
             <div class="card border-info mx-4 my-4">
                 <div class="card-body text-info">
-                    <h4 class="card-title">Rules :</h4>
+                    <h4 class="card-title">Règles :</h4>
                     <p class="card-text">
                         <ul style="list-style:decimal;">
-                            <li>All questions are multiple choice question.</li>
+                            <li>Toutes les questions sont des questions à choix multiples.</li>
                             <li><span class="text-danger">Only one choice is correct.</span></li>
                             <li>Every question carry equal marks i.e. <span class="text-danger">4 marks for each question.</span>
                             </li>
@@ -25,7 +25,9 @@
                             <li>You will be told immediately whether your answer was correct or incorrect once you submit the answer.</li>
                         </ul>
                     </p>
-                    <a href="{% url 'play' %}" class="btn btn-info">Let's play</a>
+                    {% for parcours in liste_parcours%}
+                    <a class="btn btn-primary" href="/play/{{parcours.id}}" role="button"> {{ parcours.name}}</a>
+                    {% endfor%}
                 </div>  
                 <div class="card-footer">Rules last modified 08-March-2018</div>  
             </div>  

@@ -1,7 +1,9 @@
+from secrets import choice
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import authenticate, get_user_model
 from django.utils.translation import gettext as _
+
 from .models import Question, Choice
 
 
@@ -21,7 +23,6 @@ class ChoiceForm(forms.ModelForm):
         widgets = {
             'html': forms.Textarea(attrs={'rows': 2, 'cols': 80}),
         }
-
 
 class ChoiceInlineFormset(forms.BaseInlineFormSet):
     def clean(self):

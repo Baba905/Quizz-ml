@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Question, Choice, Categorie
+from .models import Question, Choice, Categorie, Parcours
 from .forms import QuestionForm, ChoiceForm, ChoiceInlineFormset
 # Register your models here.
 
@@ -35,8 +35,13 @@ class CategorieAdmin(admin.ModelAdmin):
     model = Categorie
     list_display = ['nom']
 
+class ParcoursAdmmin(admin.ModelAdmin):
+    model = Parcours
+    list_display = ['name']
+
+
 admin.site.register(Question, QuestionAdmin)
 admin.site.register(Categorie,CategorieAdmin)
-
+admin.site.register(Parcours,ParcoursAdmmin)
 
 # Register your models here.
