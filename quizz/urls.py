@@ -1,5 +1,9 @@
-from django.urls import path
-from . import views
+from operator import imod
+from django.urls import path, include
+from quizz import views
+from rest_framework import routers
+
+router =routers.DefaultRouter()
 
 urlpatterns = [
     path('', views.home, name='home'),
@@ -12,5 +16,5 @@ urlpatterns = [
     path('register/', views.register, name='register'),
     path('resume/<int:quiz_profile_id>', views.resume_test,name='resume'),
     path('parcours/<int:id_parcours>',views.affiche_categories, name='parcours'),
-
+    path('api',include(router.urls) )
 ]

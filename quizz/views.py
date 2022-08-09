@@ -7,6 +7,9 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.http import Http404
 from .models import QuizProfile, Question, AttemptedQuestion, Parcours
 from .forms import UserLoginForm, RegistrationForm
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from quizz import serializers
 
 
 def home(request):
@@ -40,10 +43,11 @@ def play(request,id_parcours):
     global created
     if request.method == 'POST':
         quiz_profile = list(QuizProfile.objects.filter(user = request.user))[-1]
-        #print(quiz_profile.values()[-1])
-        question_pk = request.POST.get('question_pk')
+        print(quiz_profile.id)
 
-        attempted_question = quiz_profile.attempts.select_related('question').get(question__pk=question_pk)
+        question_pk = request.POST.get('question_pk')
+        print(question_pk)
+        attempted_question = quiz_profile.attempts.select_related('question').get(question_id=question_pk)
 
         choice_pk = request.POST.get('choice_pk')
 
@@ -160,3 +164,14 @@ def affiche_categories(request, id_parcours):
             'questions' :questions
         }
     return render(request,'quiz/affiche.html',context)
+
+# API Views 
+class QuestionView(APIView):
+
+    def get(self, request, format =None):
+        questions = Question.objects.all()
+        serializer = serializers.QuestionSerializer(questions, many=True)
+        return Response(serializer.data)
+    
+    #def put(self, request, format = None):
+        
