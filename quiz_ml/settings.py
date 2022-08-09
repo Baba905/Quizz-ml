@@ -25,7 +25,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-d0eqzz@-i_p=5cxh9fu%n69&z@sl^)$=stp=&a#6n@re0$hec='
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = ['quizzml.herokuapp.com']
 
