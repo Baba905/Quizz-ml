@@ -27,7 +27,8 @@ SECRET_KEY = 'django-insecure-d0eqzz@-i_p=5cxh9fu%n69&z@sl^)$=stp=&a#6n@re0$hec=
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['quizzml.herokuapp.com']
+# ALLOWED_HOSTS = ['quizzml.herokuapp.com']
+ALLOWED_HOSTS = ['*',]
 
 
 # Application definition
@@ -81,18 +82,20 @@ WSGI_APPLICATION = 'quiz_ml.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.0/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'quizz',
-        'USER': 'aboudiop',
-        'PASSWORD': 'aboudiop',
-        'HOST': 'localhost',
-        'PORT': '5432',
-    }
-}
-db_from_env = dj_database_url.config(conn_max_age=600)
-DATABASES['default'].update(db_from_env)
+
+# for herokuapp **************************
+DATABASES = { 'default': dj_database_url.config() }
+
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql',
+#         'NAME': 'quizz',
+#         'USER': 'aboudiop',
+#         'PASSWORD': 'aboudiop',
+#         'HOST': 'localhost',
+#         'PORT': '5432',
+#     }
+# }
 
 # Password validation
 # https://docs.djangoproject.com/en/4.0/ref/settings/#auth-password-validators
@@ -128,8 +131,16 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.0/howto/static-files/
 
-STATIC_URL = 'static/'
+
+# for heroku ***************
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+STATIC_URL = 'static'
+AUTH_USER_MODEL = 'api_fewnu_compta.User'
+
+MEDIA_ROOT =  os.path.join(BASE_DIR, 'media') #le chemin du serveur pour stocker les fichiers sur l’ordinateur. 
+MEDIA_URL = '/media/'# comment l’URL de référence permettant au navigateur d’accéder aux fichiers via Http.
+
+STATIC_ROOT = os.path.join(BASE_DIR, "static/")
 
 
 # Default primary key field type
