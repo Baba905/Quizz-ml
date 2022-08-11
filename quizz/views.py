@@ -142,13 +142,16 @@ def resume_test(request, quiz_profile_id,):
     tresult = []
     percentage = []
     for result in results:
-        tmp = f'{result[0]},   {result[2]/result[1]*100} %'
+        tmp = {
+            'result':f'{result[0]},   {round(result[2]/result[1]*100)} %',
+            'percent':str(result[2]/result[1]*100),
+            }
         tresult.append(tmp)
-        percentage.append(result[2]/result[1]*100)
+        #percentage.append()
     context ={
         'attempts':attempts,
         'results' : tresult,
-        'percent' : percentage
+        #'percents' : percentage
     }
     return render(request, 'quiz/resume.html',context)
 
