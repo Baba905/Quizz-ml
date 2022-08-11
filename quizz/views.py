@@ -37,13 +37,16 @@ def leaderboard(request):
 created = False
 @login_required()
 def play(request,id_parcours):
+    
     #quiz_profile, created = QuizProfile.objects.get_or_create(user=request.user)
     parcours= Parcours.objects.get(id=id_parcours)
     categories_parcours = list(parcours.categorie.all())
     global created
+    print(f" first {created}")
     if request.method == 'POST':
+        print(f" POST method {created}")
         #print(len(list(QuizProfile.objects.filter(user = request.user))))
-        quiz_profile = list(QuizProfile.objects.filter(user = request.user))[-1]
+        quiz_profile = list(QuizProfile.objects.filter(user = request.user))
         #print(quiz_profile.id)
 
         question_pk = request.POST.get('question_pk')
@@ -61,14 +64,15 @@ def play(request,id_parcours):
 
         return redirect(f'/play/{id_parcours}')
     else:
-        
+        print(f" GET method {created}")
         if not created :
             print(f" Get part {request.user}")
+
             quiz_profile= QuizProfile.objects.create(user=request.user, parcours= parcours)
             created = True
         else:
             quiz_profile = list(QuizProfile.objects.filter(user = request.user))[-1]
-            
+        
         categorie = choice(categories_parcours)
         question = quiz_profile.get_new_question(categorie.id)
 
