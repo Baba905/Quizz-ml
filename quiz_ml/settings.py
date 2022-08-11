@@ -82,18 +82,18 @@ WSGI_APPLICATION = 'quiz_ml.wsgi.application'
 
 
 # for herokuapp **************************
-# DATABASES = { 'default': dj_database_url.config() }
+DATABASES = { 'default': dj_database_url.config() }
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'quizz',
-        'USER': 'aboudiop',
-        'PASSWORD': 'aboudiop',
-        'HOST': 'localhost',
-        'PORT': '5432',
-    }
-}
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql',
+#         'NAME': 'quizz',
+#         'USER': 'aboudiop',
+#         'PASSWORD': 'aboudiop',
+#         'HOST': 'localhost',
+#         'PORT': '5432',
+#     }
+# }
 
 # Password validation
 # https://docs.djangoproject.com/en/4.0/ref/settings/#auth-password-validators
@@ -131,17 +131,17 @@ USE_TZ = True
 
 
 # for heroku ***************
-# STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 # #AUTH_USER_MODEL = 'api_fewnu_compta.User'
 
 STATIC_URL = 'static/'
 
 
-# MEDIA_ROOT =  os.path.join(BASE_DIR, 'media') #le chemin du serveur pour stocker les fichiers sur l’ordinateur. 
-# MEDIA_URL = '/media/'# comment l’URL de référence permettant au navigateur d’accéder aux fichiers via Http.
+MEDIA_ROOT =  os.path.join(BASE_DIR, 'media') #le chemin du serveur pour stocker les fichiers sur l’ordinateur. 
+MEDIA_URL = '/media/'# comment l’URL de référence permettant au navigateur d’accéder aux fichiers via Http.
 
-STATIC_ROOT = os.path.join(BASE_DIR, "static/")
+#STATIC_ROOT = os.path.join(BASE_DIR, "static/")
 
 
 # Default primary key field type

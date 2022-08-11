@@ -68,6 +68,7 @@ def play(request,id_parcours):
             created = True
         else:
             quiz_profile = list(QuizProfile.objects.filter(user = request.user))[-1]
+            
         categorie = choice(categories_parcours)
         question = quiz_profile.get_new_question(categorie.id)
 
