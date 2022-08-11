@@ -26,7 +26,7 @@ def user_home(request):
 
 def leaderboard(request):
 
-    top_quiz_profiles = QuizProfile.objects.filter(user = request.user).order_by('-total_score')[:500]
+    top_quiz_profiles = QuizProfile.objects.filter(user = request.user).order_by('-id')[:500]
     total_count = top_quiz_profiles.count()
     context = {
         'top_quiz_profiles': top_quiz_profiles,

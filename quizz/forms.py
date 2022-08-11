@@ -10,7 +10,7 @@ from .models import Question, Choice
 class QuestionForm(forms.ModelForm):
     class Meta:
         model = Question
-        fields = ['html', 'is_published', 'categorie']
+        fields = ['html', 'is_published', 'categorie', 'maximum_marks']
         widgets = {
             'html': forms.Textarea(attrs={'rows': 3, 'cols': 80}),
         }
