@@ -1,1 +1,3 @@
-web: gunicorn quiz_ml.wsgi --log-file 
+web: gunicorn quiz_ml.wsgi:application --log-file - --log-level debug
+python manage.py collectstatic --noinput
+manage.py migrate
