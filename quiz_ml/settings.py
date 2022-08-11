@@ -82,18 +82,18 @@ WSGI_APPLICATION = 'quiz_ml.wsgi.application'
 
 
 # for herokuapp **************************
-DATABASES = { 'default': dj_database_url.config() }
+# DATABASES = { 'default': dj_database_url.config() }
 
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.postgresql',
-#         'NAME': 'quizz',
-#         'USER': 'aboudiop',
-#         'PASSWORD': 'aboudiop',
-#         'HOST': 'localhost',
-#         'PORT': '5432',
-#     }
-# }
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'quizz',
+        'USER': 'aboudiop',
+        'PASSWORD': 'aboudiop',
+        'HOST': 'localhost',
+        'PORT': '5432',
+    }
+}
 
 # Password validation
 # https://docs.djangoproject.com/en/4.0/ref/settings/#auth-password-validators
