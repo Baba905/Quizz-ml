@@ -27,7 +27,7 @@ SECRET_KEY = 'django-insecure-d0eqzz@-i_p=5cxh9fu%n69&z@sl^)$=stp=&a#6n@re0$hec=
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = []
 
 
 # Application definition
@@ -43,7 +43,7 @@ INSTALLED_APPS = [
     'quizz',
     'crispy_forms',
     'rest_framework',
-    'whitenoise.runserver_nostatic',
+    #'whitenoise.runserver_nostatic',
 ]
 
 MIDDLEWARE = [
@@ -81,18 +81,18 @@ WSGI_APPLICATION = 'quiz_ml.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.0/ref/settings/#databases
 
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.postgresql',
-#         'NAME': 'quizz',
-#         'USER': 'aboudiop',
-#         'PASSWORD': 'aboudiop',
-#         'HOST': 'localhost',
-#         'PORT': '5432',
-#     }
-# }
-db_from_env = dj_database_url.config(conn_max_age=600)
-DATABASES = { 'default': dj_database_url.config() }
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'quizz',
+        'USER': 'aboudiop',
+        'PASSWORD': 'aboudiop',
+        'HOST': 'localhost',
+        'PORT': '5432',
+    }
+}
+# db_from_env = dj_database_url.config(conn_max_age=600)
+# DATABASES = { 'default': dj_database_url.config() }
 
 # Password validation
 # https://docs.djangoproject.com/en/4.0/ref/settings/#auth-password-validators
@@ -129,7 +129,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.0/howto/static-files/
 
 STATIC_URL = 'static/'
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+#STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 
 # Default primary key field type
