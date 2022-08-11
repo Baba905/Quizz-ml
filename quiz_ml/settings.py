@@ -132,13 +132,11 @@ USE_TZ = True
 
 # for heroku ***************
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
-<<<<<<< HEAD
-STATIC_URL = 'static/'
+
 #AUTH_USER_MODEL = 'api_fewnu_compta.User'
-=======
-STATIC_URL = 'static'
-AUTH_USER_MODEL = 'api_fewnu_compta.User'
->>>>>>> 052efc13471f004bb1656d8d998c95e81215be45
+
+STATIC_URL = 'static/'
+
 
 MEDIA_ROOT =  os.path.join(BASE_DIR, 'media') #le chemin du serveur pour stocker les fichiers sur l’ordinateur. 
 MEDIA_URL = '/media/'# comment l’URL de référence permettant au navigateur d’accéder aux fichiers via Http.
