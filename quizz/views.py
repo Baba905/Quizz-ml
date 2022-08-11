@@ -42,11 +42,12 @@ def play(request,id_parcours):
     categories_parcours = list(parcours.categorie.all())
     global created
     if request.method == 'POST':
+        #print(len(list(QuizProfile.objects.filter(user = request.user))))
         quiz_profile = list(QuizProfile.objects.filter(user = request.user))[-1]
-        print(quiz_profile.id)
+        #print(quiz_profile.id)
 
         question_pk = request.POST.get('question_pk')
-        print(question_pk)
+        #print(question_pk)
         attempted_question = quiz_profile.attempts.select_related('question').get(question_id=question_pk)
 
         choice_pk = request.POST.get('choice_pk')
@@ -59,17 +60,17 @@ def play(request,id_parcours):
         quiz_profile.evaluate_attempt(attempted_question, selected_choice)
 
         return redirect(f'/play/{id_parcours}')
-
     else:
         
         if not created :
-            print(request.user)
+            print(f" Get part {request.user}")
             quiz_profile= QuizProfile.objects.create(user=request.user, parcours= parcours)
             created = True
         else:
             quiz_profile = list(QuizProfile.objects.filter(user = request.user))[-1]
         categorie = choice(categories_parcours)
         question = quiz_profile.get_new_question(categorie.id)
+
         if question is not None:
             quiz_profile.create_attempt(question)
         else:
