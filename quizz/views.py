@@ -46,7 +46,8 @@ def play(request,id_parcours):
     if request.method == 'POST':
         print(f" POST method {created}")
         #print(len(list(QuizProfile.objects.filter(user = request.user))))
-        quiz_profile = list(QuizProfile.objects.filter(user = request.user))
+        list_quizprofile = list(QuizProfile.objects.filter(user = request.user))
+        quiz_profile = list_quizprofile[-1]
         #print(quiz_profile.id)
 
         question_pk = request.POST.get('question_pk')
