@@ -17,7 +17,7 @@ class ChoiceInline(admin.TabularInline):
 class QuestionAdmin(admin.ModelAdmin):
     model = Question
     inlines = (ChoiceInline, )
-    list_display = ['html', 'is_published', 'categorie']
+    list_display = ['html', 'is_published', 'categorie','maximum_marks']
     list_filter = ['is_published']
     search_fields = ['html', 'choices__html']
     actions = None
