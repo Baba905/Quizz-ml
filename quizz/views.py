@@ -46,12 +46,11 @@ def play(request,id_parcours):
     #quiz_profile, created = QuizProfile.objects.get_or_create(user=request.user)
     parcours= Parcours.objects.get(id=id_parcours)
     categories_parcours = list(parcours.categorie.all())
-    global created
-    print(f" request.method= {request.method}")
-    print(f" first {created}")
+    #print(f" request.method= {request.method}")
+    #print(f" first {created}")
     if request.method == 'POST':
-        print(f" POST method {created}")
-        print(len(list(QuizProfile.objects.filter(user = request.user))))
+        #print(f" POST method {created}")
+        #print(len(list(QuizProfile.objects.filter(user = request.user))))
         list_quizprofile = list(QuizProfile.objects.filter(user = request.user))
         quiz_profile = list_quizprofile[-1]
         #print(quiz_profile.id)
@@ -76,13 +75,13 @@ def play(request,id_parcours):
             print(f" Get part {request.user}")
             print(f" Get parcours {parcours}")
             quiz_profile= QuizProfile.objects.create(user=request.user, parcours= parcours)
-            print(f"  not created {created}")
+            #print(f"  not created {created}")
             global created
             created = True
-            print(f" GET created {created}")
+            #print(f" GET created {created}")
         else:
-            print(f"GET else  created {created}")
-            print("number of quizprofile linked to this user",len(list(QuizProfile.objects.filter(user = request.user))))
+            #print(f"GET else  created {created}")
+            #print("number of quizprofile linked to this user",len(list(QuizProfile.objects.filter(user = request.user))))
             quiz_profile = list(QuizProfile.objects.filter(user = request.user))[-1]
         
         categorie = choice(categories_parcours)
