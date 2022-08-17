@@ -14,7 +14,7 @@ from rest_framework.response import Response
 from quizz import serializers
 import pandas as pd
 
-global created
+
 created = False
 def home(request):
     context = {}
@@ -24,8 +24,8 @@ def home(request):
 @login_required()
 def user_home(request):
     global created
-    parcours = Parcours.objects.all()
     created = False
+    parcours = Parcours.objects.all()
     context = {'liste_parcours': parcours}
     return render(request, 'quiz/user_home.html', context=context)
 
@@ -43,7 +43,7 @@ def leaderboard(request):
 
 @login_required()
 def play(request,id_parcours):
-    
+    global created
     #quiz_profile, created = QuizProfile.objects.get_or_create(user=request.user)
     parcours= Parcours.objects.get(id=id_parcours)
     categories_parcours = list(parcours.categorie.all())
@@ -72,13 +72,12 @@ def play(request,id_parcours):
         return redirect(f'/play/{id_parcours}')
     else:
         #print(f" GET method {created}")
-        global created
         if not created :
-            print(f" Get part {request.user}")
-            print(f" Get parcours {parcours}")
+            #print(f" Get part {request.user}")
+            #print(f" Get parcours {parcours}")
             quiz_profile= QuizProfile.objects.create(user=request.user, parcours= parcours)
             #print(f"  not created {created}")
-            global created
+            #global created
             created = True
             #print(f" GET created {created}")
         else:
@@ -92,7 +91,7 @@ def play(request,id_parcours):
         if question is not None:
             quiz_profile.create_attempt(question)
         else:
-           global created
+           
            created= False
         #print(f" GET method second{created}")
         context = {
