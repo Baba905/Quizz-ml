@@ -72,6 +72,7 @@ def play(request,id_parcours):
         return redirect(f'/play/{id_parcours}')
     else:
         #print(f" GET method {created}")
+        global created
         if not created :
             print(f" Get part {request.user}")
             print(f" Get parcours {parcours}")
