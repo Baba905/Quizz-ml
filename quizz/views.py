@@ -77,6 +77,7 @@ def play(request,id_parcours):
             print(f" Get parcours {parcours}")
             quiz_profile= QuizProfile.objects.create(user=request.user, parcours= parcours)
             print(f"  not created {created}")
+            global created
             created = True
             print(f" GET created {created}")
         else:
@@ -90,7 +91,8 @@ def play(request,id_parcours):
         if question is not None:
             quiz_profile.create_attempt(question)
         else:
-            created= False
+           global created
+           created= False
         #print(f" GET method second{created}")
         context = {
             'question': question,
