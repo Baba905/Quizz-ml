@@ -14,6 +14,7 @@ from rest_framework.response import Response
 from quizz import serializers
 import pandas as pd
 
+global created
 created = False
 def home(request):
     context = {}
