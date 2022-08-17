@@ -14,7 +14,7 @@ from rest_framework.response import Response
 from quizz import serializers
 import pandas as pd
 
-
+created = False
 def home(request):
     context = {}
     return render(request, 'quiz/home.html', context=context)
@@ -22,6 +22,7 @@ def home(request):
 
 @login_required()
 def user_home(request):
+    global created
     parcours = Parcours.objects.all()
     created = False
     context = {'liste_parcours': parcours}
@@ -38,7 +39,7 @@ def leaderboard(request):
     }
     return render(request, 'quiz/leaderboard.html', context=context)
 
-created = False
+
 @login_required()
 def play(request,id_parcours):
     
@@ -46,7 +47,8 @@ def play(request,id_parcours):
     parcours= Parcours.objects.get(id=id_parcours)
     categories_parcours = list(parcours.categorie.all())
     global created
-    #print(f" first {created}")
+    print(f" request.method= {request.method}")
+    print(f" first {created}")
     if request.method == 'POST':
         print(f" POST method {created}")
         print(len(list(QuizProfile.objects.filter(user = request.user))))
@@ -71,11 +73,15 @@ def play(request,id_parcours):
     else:
         #print(f" GET method {created}")
         if not created :
-            #print(f" Get part {request.user}")
-
+            print(f" Get part {request.user}")
+            print(f" Get parcours {parcours}")
             quiz_profile= QuizProfile.objects.create(user=request.user, parcours= parcours)
+            print(f"  not created {created}")
             created = True
+            print(f" GET created {created}")
         else:
+            print(f"GET else  created {created}")
+            print("number of quizprofile linked to this user",len(list(QuizProfile.objects.filter(user = request.user))))
             quiz_profile = list(QuizProfile.objects.filter(user = request.user))[-1]
         
         categorie = choice(categories_parcours)
