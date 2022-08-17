@@ -16,5 +16,6 @@ urlpatterns = [
     path('register/', views.register, name='register'),
     path('resume/<int:quiz_profile_id>', views.resume_test,name='resume'),
     path('parcours/<int:id_parcours>',views.affiche_categories, name='parcours'),
-    path('api',include(router.urls) )
+    path('add-question', views.add_questions_with_excel, name='add_with_excel'),
+    path('api',include(router.urls) ),
 ]

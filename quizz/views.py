@@ -1,15 +1,18 @@
+from cgitb import html
 from multiprocessing import context
 from random import choice
+from traceback import print_tb
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ObjectDoesNotExist
 from django.http import Http404
-from .models import QuizProfile, Question, AttemptedQuestion, Parcours
-from .forms import UserLoginForm, RegistrationForm
+from .models import Categorie, QuizProfile, Question, AttemptedQuestion, Parcours, Choice
+from .forms import UserLoginForm, RegistrationForm, AddWithExcel
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from quizz import serializers
+import pandas as pd
 
 
 def home(request):
@@ -20,6 +23,7 @@ def home(request):
 @login_required()
 def user_home(request):
     parcours = Parcours.objects.all()
+    created = False
     context = {'liste_parcours': parcours}
     return render(request, 'quiz/user_home.html', context=context)
 
@@ -42,16 +46,16 @@ def play(request,id_parcours):
     parcours= Parcours.objects.get(id=id_parcours)
     categories_parcours = list(parcours.categorie.all())
     global created
-    print(f" first {created}")
+    #print(f" first {created}")
     if request.method == 'POST':
         print(f" POST method {created}")
-        #print(len(list(QuizProfile.objects.filter(user = request.user))))
+        print(len(list(QuizProfile.objects.filter(user = request.user))))
         list_quizprofile = list(QuizProfile.objects.filter(user = request.user))
         quiz_profile = list_quizprofile[-1]
         #print(quiz_profile.id)
 
         question_pk = request.POST.get('question_pk')
-        #print(question_pk)
+        #print(question_pk)chrome://whats-new/
         attempted_question = quiz_profile.attempts.select_related('question').get(question_id=question_pk)
 
         choice_pk = request.POST.get('choice_pk')
@@ -65,9 +69,9 @@ def play(request,id_parcours):
 
         return redirect(f'/play/{id_parcours}')
     else:
-        print(f" GET method {created}")
+        #print(f" GET method {created}")
         if not created :
-            print(f" Get part {request.user}")
+            #print(f" Get part {request.user}")
 
             quiz_profile= QuizProfile.objects.create(user=request.user, parcours= parcours)
             created = True
@@ -81,6 +85,7 @@ def play(request,id_parcours):
             quiz_profile.create_attempt(question)
         else:
             created= False
+        #print(f" GET method second{created}")
         context = {
             'question': question,
             'parcours' : parcours,
@@ -174,6 +179,39 @@ def affiche_categories(request, id_parcours):
             'questions' :questions
         }
     return render(request,'quiz/affiche.html',context)
+
+
+def add_questions_with_excel(request):
+    if request.method== 'POST':
+        form = AddWithExcel(request.POST)
+
+        if form.is_valid():
+            path = form.cleaned_data['path_file']
+            questions = pd.read_excel(path, index_col=0)
+            questions = questions.head()
+
+            for i in range(1, len(questions)+1):
+                ques_excel = questions.loc[i]
+                categorie = Categorie.objects.get(nom= ques_excel["Categories"])
+                question = Question(html=ques_excel["Questions"], categorie= categorie)
+                question.save()
+                good_answer = int(ques_excel['Bonne_reponse'][-1])
+
+                for j in range(4):
+                    if j == good_answer-1:
+                        choice = Choice(html=ques_excel[f"Opt{j+1}"],question=question,is_correct= True)
+                        choice.save()
+                    else:
+                        choice = Choice(html=ques_excel[f"Opt{j+1}"],question=question)
+                        choice.save()
+            return redirect('home') 
+        else :
+            return Http404("Formulaire non valide")
+    else:
+        form = AddWithExcel()
+        context = {'form':form}
+        return render(request,'quiz/parametre.html',context)
+
 
 # API Views 
 class QuestionView(APIView):

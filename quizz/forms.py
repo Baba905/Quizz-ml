@@ -90,3 +90,7 @@ class RegistrationForm(UserCreationForm):
             user.save()
 
         return user
+
+
+class AddWithExcel(forms.Form):
+    path_file = forms.CharField(max_length=255)
