@@ -17,10 +17,15 @@
 			{{ attempted.selected_choice.html|safe }}
 		</p>
 
+
 		{% if attempted.selected_choice.is_correct %}
 		<h4 class="text-success">Reponse correct. High Five! 🙌</h4>
 		{% else %}
 		<h4 class="text-danger">Reponse incorrect 😟</h4>
+		<p>
+			<strong>Correct answer: </strong>
+			{{ attempted.question.correct_choice.html|safe }}
+		</p>
 		{% endif %}
 
 	</div>

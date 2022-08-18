@@ -68,6 +68,14 @@ class Question(models.Model):
     
     def __str__(self):
         return self.html
+    
+    def correct_choice(self):
+        corr_choice=None
+        list_choice = Choice.objects.filter(question_id= self.id)
+        for choice in list_choice:
+            if choice.is_correct:
+                corr_choice=choice
+        return corr_choice
 
 
 class Choice(models.Model):
@@ -85,7 +93,7 @@ class QuizProfile(models.Model):
     user = models.ForeignKey(User, related_name='quizprofiles',on_delete=models.CASCADE)
     total_score = models.DecimalField(_('Total Score'), default=0, decimal_places=2, max_digits=10)
     parcours = models.ForeignKey(Parcours, null=True,on_delete=models.CASCADE, related_name= 'quizprofile')
-    
+    completed = models.BooleanField(_('Is the quizz is completed'),default=False, null=True)
     def __str__(self):
         return f'<QuizProfile: user={self.user}>'
     
@@ -94,6 +102,7 @@ class QuizProfile(models.Model):
         remaining_questions = Question.objects.exclude(pk__in=used_questions_pk).filter(categorie_id=id_categorie)
         #print(f" reste question {len(remaining_questions) }")
         if len(used_questions_pk) == NUMBER_OF_QUESTIONS :
+            self.complete_quizz()
             return 
         return random.choice(remaining_questions)
 
@@ -131,6 +140,28 @@ class QuizProfile(models.Model):
                     count+=1
             result.append([questions[0].categorie.nom,len(questions), count])
         return result
+    
+    def success_rate(self):
+        list_question = self.parcours.questions_from_quizprofile(self.id)
+        count=0
+        number_question=0
+        rate =0
+        for questions in list_question:
+            for question in questions:
+                attempt = AttemptedQuestion.objects.get(quiz_profile_id =self.id, question_id= question.id)
+                if attempt.is_correct:
+                    count+=1
+                number_question+=1
+            print("number question",number_question)
+        print("number question",number_question)
+        print("count", count)
+        rate = round((count/number_question)*100)
+        print("rate",rate)
+        return rate
+    def complete_quizz(self):
+        self.completed = True
+        self.save()
+
         
 
 

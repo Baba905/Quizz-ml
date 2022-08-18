@@ -31,8 +31,7 @@ def user_home(request):
 
 
 def leaderboard(request):
-
-    top_quiz_profiles = QuizProfile.objects.filter(user = request.user).order_by('-id')[:500]
+    top_quiz_profiles = QuizProfile.objects.filter(user = request.user, completed= True).order_by('id')[:500]
     total_count = top_quiz_profiles.count()
     context = {
         'top_quiz_profiles': top_quiz_profiles,
@@ -44,56 +43,37 @@ def leaderboard(request):
 @login_required()
 def play(request,id_parcours):
     global created
-    #quiz_profile, created = QuizProfile.objects.get_or_create(user=request.user)
     parcours= Parcours.objects.get(id=id_parcours)
     categories_parcours = list(parcours.categorie.all())
-    #print(f" request.method= {request.method}")
-    #print(f" first {created}")
     if request.method == 'POST':
-        #print(f" POST method {created}")
-        #print(len(list(QuizProfile.objects.filter(user = request.user))))
         list_quizprofile = list(QuizProfile.objects.filter(user = request.user))
         quiz_profile = list_quizprofile[-1]
-        #print(quiz_profile.id)
 
         question_pk = request.POST.get('question_pk')
-        #print(question_pk)chrome://whats-new/
         attempted_question = quiz_profile.attempts.select_related('question').get(question_id=question_pk)
-
         choice_pk = request.POST.get('choice_pk')
 
         try:
             selected_choice = attempted_question.question.choices.get(pk=choice_pk)
         except ObjectDoesNotExist:
-            raise Http404
+            return no_choice_selected(request, id_parcours)
 
         quiz_profile.evaluate_attempt(attempted_question, selected_choice)
 
         return redirect(f'/play/{id_parcours}')
     else:
-        #print(f" GET method {created}")
         if not created :
-            #print(f" Get part {request.user}")
-            #print(f" Get parcours {parcours}")
             quiz_profile= QuizProfile.objects.create(user=request.user, parcours= parcours)
-            #print(f"  not created {created}")
-            #global created
             created = True
-            #print(f" GET created {created}")
         else:
-            #print(f"GET else  created {created}")
-            #print("number of quizprofile linked to this user",len(list(QuizProfile.objects.filter(user = request.user))))
             quiz_profile = list(QuizProfile.objects.filter(user = request.user))[-1]
-        
         categorie = choice(categories_parcours)
         question = quiz_profile.get_new_question(categorie.id)
-
         if question is not None:
             quiz_profile.create_attempt(question)
         else:
-           
            created= False
-        #print(f" GET method second{created}")
+
         context = {
             'question': question,
             'parcours' : parcours,
@@ -167,11 +147,10 @@ def resume_test(request, quiz_profile_id,):
             'percent':str(result[2]/result[1]*100),
             }
         tresult.append(tmp)
-        #percentage.append()
+        
     context ={
         'attempts':attempts,
         'results' : tresult,
-        #'percents' : percentage
     }
     return render(request, 'quiz/resume.html',context)
 
@@ -220,6 +199,12 @@ def add_questions_with_excel(request):
         context = {'form':form}
         return render(request,'quiz/parametre.html',context)
 
+
+def no_choice_selected(request, id_parcours):
+    context = {
+        'id':id_parcours
+    }
+    return render(request,'quiz/not_selected_choice.html',context)
 
 # API Views 
 class QuestionView(APIView):
