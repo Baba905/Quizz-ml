@@ -158,6 +158,7 @@ class QuizProfile(models.Model):
         rate = round((count/number_question)*100)
         print("rate",rate)
         return rate
+        
     def complete_quizz(self):
         self.completed = True
         self.save()
