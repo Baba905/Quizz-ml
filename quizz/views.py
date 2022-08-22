@@ -15,7 +15,7 @@ from quizz import serializers
 import pandas as pd
 
 
-created = False
+#created = False
 def home(request):
     context = {}
     return render(request, 'quiz/home.html', context=context)
@@ -23,9 +23,9 @@ def home(request):
 
 @login_required()
 def user_home(request):
-    global created
-    if created :
-        created = False
+    # global created
+    # if created :
+    #     created = False
     parcours = Parcours.objects.all()
     context = {'liste_parcours': parcours}
     return render(request, 'quiz/user_home.html', context=context)
@@ -42,14 +42,23 @@ def leaderboard(request):
 
 
 @login_required()
-def play(request,id_parcours):
-    global created
+def play(request,id_parcours,completed):
+
+    #global created
+    quiz_profile= None
+    if completed=="False":
+        quizprofiles = QuizProfile.objects.filter(user_id = request.user,parcours_id=id_parcours,completed= False)
+        if len(quizprofiles)==0:
+            quiz_profile = QuizProfile.objects.create(user_id = request.user.id,parcours_id=id_parcours)
+        else :
+            quiz_profile = QuizProfile.objects.filter(user_id = request.user,parcours_id=id_parcours,completed= False)[0]
+    print("quiz id ", quiz_profile.id)
     parcours= Parcours.objects.get(id=id_parcours)
     categories_parcours = list(parcours.categorie.all())
-    print(f"First{created}")
+    #print(f"First{created}")
     if request.method == 'POST':
-        list_quizprofile = list(QuizProfile.objects.filter(user = request.user))
-        quiz_profile = list_quizprofile[-1]
+        # list_quizprofile = list(QuizProfile.objects.filter(user = request.user))
+        # quiz_profile = list_quizprofile[-1]
 
         question_pk = request.POST.get('question_pk')
         attempted_question = quiz_profile.attempts.select_related('question').get(question_id=question_pk)
@@ -62,30 +71,22 @@ def play(request,id_parcours):
 
         quiz_profile.evaluate_attempt(attempted_question, selected_choice)
 
-        return redirect(f'/play/{id_parcours}')
+        return redirect(f'/play/{id_parcours}/{quiz_profile.completed}')
     else:
-        print(f"GET mehtod{created}")
-        if not created :
-            quiz_profile= QuizProfile.objects.create(user=request.user, parcours= parcours)
-            #global created
-            created = True
-            print("New quiz profile")
-        else:
-            print("last quiz profile")
-            quiz_profile = list(QuizProfile.objects.filter(user = request.user))[-1]
         categorie = choice(categories_parcours)
-
         question = quiz_profile.get_new_question(categorie.id)
+        completed_quiz = str(quiz_profile.completed)
+        number_answer = len(AttemptedQuestion.objects.filter( quiz_profile_id=quiz_profile.id))
         if question is not None:
-            
             quiz_profile.create_attempt(question)
         else:
            print("completed quiz profile")
-           created= False
 
         context = {
             'question': question,
             'parcours' : parcours,
+            'completed': completed_quiz,
+            'number_answer': number_answer,
         }
 
         return render(request, 'quiz/play.html', context=context)

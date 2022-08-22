@@ -152,16 +152,24 @@ class QuizProfile(models.Model):
                 if attempt.is_correct:
                     count+=1
                 number_question+=1
-            print("number question",number_question)
-        print("number question",number_question)
-        print("count", count)
+            
         rate = round((count/number_question)*100)
-        print("rate",rate)
         return rate
         
     def complete_quizz(self):
         self.completed = True
         self.save()
+
+    def get_quizprofile(self, id_parcours, id_user ):
+        result = None
+        quizprofiles = QuizProfile.objects.filter(user_id = id_user,parcours_id=id_parcours,completed= False)
+        if len(quizprofiles)==0:
+            result = QuizProfile.objects.create(user_id = id_user,parcours_id=id_parcours)
+        else :
+            result =quizprofiles = QuizProfile.objects.filter(user_id = id_user,parcours_id=id_parcours,completed= False)[0]
+
+        return result
+        
 
         
 
