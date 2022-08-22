@@ -24,7 +24,8 @@ def home(request):
 @login_required()
 def user_home(request):
     global created
-    created = False
+    if created :
+        created = False
     parcours = Parcours.objects.all()
     context = {'liste_parcours': parcours}
     return render(request, 'quiz/user_home.html', context=context)
@@ -45,6 +46,7 @@ def play(request,id_parcours):
     global created
     parcours= Parcours.objects.get(id=id_parcours)
     categories_parcours = list(parcours.categorie.all())
+    print(f"First{created}")
     if request.method == 'POST':
         list_quizprofile = list(QuizProfile.objects.filter(user = request.user))
         quiz_profile = list_quizprofile[-1]
@@ -62,16 +64,23 @@ def play(request,id_parcours):
 
         return redirect(f'/play/{id_parcours}')
     else:
+        print(f"GET mehtod{created}")
         if not created :
             quiz_profile= QuizProfile.objects.create(user=request.user, parcours= parcours)
+            #global created
             created = True
+            print("New quiz profile")
         else:
+            print("last quiz profile")
             quiz_profile = list(QuizProfile.objects.filter(user = request.user))[-1]
         categorie = choice(categories_parcours)
+
         question = quiz_profile.get_new_question(categorie.id)
         if question is not None:
+            
             quiz_profile.create_attempt(question)
         else:
+           print("completed quiz profile")
            created= False
 
         context = {
