@@ -13,7 +13,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from quizz import serializers
 import pandas as pd
-
+from quizz.recommender import Recommender, SIM_OPTION
 
 #created = False
 def home(request):
@@ -216,6 +216,38 @@ def no_choice_selected(request, id_parcours):
     }
     return render(request,'quiz/not_selected_choice.html',context)
 
+
+def recommandation(request):
+    recommender_engine= Recommender(sim_options=SIM_OPTION)
+    quiz = QuizProfile.objects.filter(user_id=1).distinct('parcours')
+    categories = []
+    last_quiz = []
+
+    list_of_recommandation = {
+        'critique':[],
+        'amelioration':[],
+    }
+    for elt in quiz:
+        id_elt =elt.id
+        tmp =QuizProfile.objects.filter(parcours= id_elt).latest('completed')
+        last_quiz.append(tmp)
+
+    
+    recommender_engine.train_recommenders(request.user.id)
+    
+    for quizprofile in last_quiz:
+        for categorie in quizprofile.parcour.categorie.all():
+            tmp = round(recommender_engine.predict(quizprofile.id, categorie.nom)*100)
+            if tmp > 60:
+                list_of_recommandation['critique'].append(categorie.nom)
+            elif tmp > 20:
+                list_of_recommandation['amelioration'].append(categorie.nom)
+            
+
+    context ={
+        'recommandations': list_of_recommandation,
+    }
+    return render(request, 'quiz/leaderboard.html', context)
 # API Views 
 class QuestionView(APIView):
 

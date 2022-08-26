@@ -25,5 +25,17 @@
             {% endfor %}
         </tbody>
     </table>
+    <div class="row">
+
+        {% if recommandtions is None%}
+        <p>Rien à recommander</p>
+        {%else%}
+            {%for recommandation in recommandations%}
+                {%for elt in recommandations.recommandation%}
+                <p><span class="badge text-bg-primary">{{recommandation}}</span> </p>
+                {%endfor%}
+            {%endfor%}
+        {%endif%}
+    </div>
 </div>
 {% endblock content %}

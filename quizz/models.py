@@ -160,20 +160,7 @@ class QuizProfile(models.Model):
         self.completed = True
         self.save()
 
-    def get_quizprofile(self, id_parcours, id_user ):
-        result = None
-        quizprofiles = QuizProfile.objects.filter(user_id = id_user,parcours_id=id_parcours,completed= False)
-        if len(quizprofiles)==0:
-            result = QuizProfile.objects.create(user_id = id_user,parcours_id=id_parcours)
-        else :
-            result =quizprofiles = QuizProfile.objects.filter(user_id = id_user,parcours_id=id_parcours,completed= False)[0]
-
-        return result
-        
-
-        
-
-
+    
 class AttemptedQuestion(models.Model):
     question = models.ForeignKey(Question, on_delete=models.CASCADE)
     quiz_profile = models.ForeignKey(QuizProfile, on_delete=models.CASCADE, related_name='attempts')
@@ -183,4 +170,5 @@ class AttemptedQuestion(models.Model):
 
     def get_absolute_url(self):
         return f'/submission-result/{self.pk}/'
+
 
