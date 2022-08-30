@@ -20,22 +20,12 @@
                 <td>{{ quiz_profile.user.username }}</td>
                 <td>{{ quiz_profile.success_rate}}%</td> 
                 <td>{{quiz_profile.parcours}}</td>
-                <td><a class="btn btn-primary" href="/resume/{{quiz_profile.id}}" role="button">Resume</a></td>
+                <td><a class="btn btn-lg btn-info mt-1" href="/resume/{{quiz_profile.id}}" role="button">Resume</a></td>
             </tr>
             {% endfor %}
         </tbody>
     </table>
-    <div class="row">
 
-        {% if recommandtions is None%}
-        <p>Rien à recommander</p>
-        {%else%}
-            {%for recommandation in recommandations%}
-                {%for elt in recommandations.recommandation%}
-                <p><span class="badge text-bg-primary">{{recommandation}}</span> </p>
-                {%endfor%}
-            {%endfor%}
-        {%endif%}
-    </div>
-</div>
+    <a href="/recommandation" class="btn btn-lg btn-info mt-1">Voir recommandation</a>
+
 {% endblock content %}

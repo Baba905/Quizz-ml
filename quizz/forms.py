@@ -79,7 +79,7 @@ class RegistrationForm(UserCreationForm):
             'password1',
             'password2',
         ]
-
+    
     def save(self, commit=True):
         user = super(RegistrationForm, self).save(commit=False)
         user.first_name = self.cleaned_data['first_name']
@@ -93,4 +93,6 @@ class RegistrationForm(UserCreationForm):
 
 
 class AddWithExcel(forms.Form):
-    path_file = forms.CharField(max_length=255)
+    path_file = forms.FileField(widget=forms.FileInput(attrs={'class': 'form-control', 'placeholder':
+        'Upload excel', 'help_text': 'Choose a .csv file with products to enter'}))
+    

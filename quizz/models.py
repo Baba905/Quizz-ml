@@ -7,6 +7,13 @@ from django.contrib.auth.models import User
 from django.utils.translation import gettext as _
 NUMBER_OF_QUESTIONS = 10
 
+class Domaine(models.Model):
+    name= models.CharField(max_length=255)
+    
+    def __str__(self) -> str:
+        return self.name
+
+
 class Categorie(models.Model):
     nom = models.CharField(max_length=255)
 
@@ -30,7 +37,7 @@ class Categorie(models.Model):
 class Parcours(models.Model):
     name = models.CharField(max_length=255)
     categorie = models.ManyToManyField(Categorie, related_name='parcourss')
-
+    domaine = models.ForeignKey(Domaine, on_delete= models.CASCADE, related_name='parcours',null=True)
     def __str__(self) -> str:
         return self.name
 
@@ -172,3 +179,7 @@ class AttemptedQuestion(models.Model):
         return f'/submission-result/{self.pk}/'
 
 
+class Tutorial(models.Model):
+    categorie = models.ForeignKey(Categorie,on_delete=models.CASCADE, related_name='tutorials')
+    contenu  = models.TextField(_('Contenu video'),max_length=255)
+    link = models.CharField(_('Link of video'), max_length=255)

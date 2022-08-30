@@ -15,8 +15,11 @@
         <a href="{% url 'register' %}" class="btn btn-lg btn-info mt-1"><i class="fa fa-user-plus" aria-hidden="true"></i> Sign Up</a>
 
         {% else %}
-        <a href="{% url 'user_home' %}" class="btn btn-lg btn-info mt-1">Let's play</a>
-        <a href="{% url 'leaderboard' %}" class="btn btn-lg btn-info mt-1">Leaderboard</a>
+          <p class="lead">Choisir votre domaine:</p>
+          {% for domaine in domaines %}
+          <a href="/user-home/{{domaine.id}}/" class="btn btn-lg btn-info mt-1" role="button"> {{ domaine.name}}</a>
+          {% endfor %}
+
         {% endif %}
       </div>  
     </section>

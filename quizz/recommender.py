@@ -43,7 +43,7 @@ class Recommender(KNNWithMeans):
         interact = {}
         interact["categories"] ,interact["quiz"],interact["ratings"] = convert_quizprofile_to_liste(quiz_liste)
         df = pd.DataFrame(interact)
-        print(df)
+        #print(df)
         reader = Reader(rating_scale=(0, 1))
         data = Dataset.load_from_df(df[[ "quiz","categories","ratings"]], reader)
         return data
@@ -55,4 +55,4 @@ class Recommender(KNNWithMeans):
 
     def make_prediction(self,quiz,categorie):
         prediction = self.predict(quiz, categorie)
-        return prediction
+        return prediction.est

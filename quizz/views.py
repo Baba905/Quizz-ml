@@ -7,7 +7,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ObjectDoesNotExist
 from django.http import Http404
-from .models import Categorie, QuizProfile, Question, AttemptedQuestion, Parcours, Choice
+from .models import Categorie, Domaine, QuizProfile, Question, AttemptedQuestion, Parcours, Choice, Tutorial
 from .forms import UserLoginForm, RegistrationForm, AddWithExcel
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -17,16 +17,14 @@ from quizz.recommender import Recommender, SIM_OPTION
 
 #created = False
 def home(request):
-    context = {}
+    domaines= Domaine.objects.all()
+    context = {'domaines':domaines}
     return render(request, 'quiz/home.html', context=context)
 
 
 @login_required()
-def user_home(request):
-    # global created
-    # if created :
-    #     created = False
-    parcours = Parcours.objects.all()
+def user_home(request, id_domaine):
+    parcours = Parcours.objects.filter(domaine_id=id_domaine)
     context = {'liste_parcours': parcours}
     return render(request, 'quiz/user_home.html', context=context)
 
@@ -180,30 +178,30 @@ def affiche_categories(request, id_parcours):
 
 def add_questions_with_excel(request):
     if request.method== 'POST':
-        form = AddWithExcel(request.POST)
+        
+        form = AddWithExcel(data=request.POST)
 
-        if form.is_valid():
-            path = form.cleaned_data['path_file']
-            questions = pd.read_excel(path, index_col=0)
-            questions = questions.head()
+        print(form.is_valid())
+        #path = form.cleaned_data['path_file']
+        # questions = pd.read_excel(file_name, index_col=0)
+        # questions = questions.head()
+        #print(form.cleaned_data['path_file'])
+        # for i in range(0, len(questions)):
+        #     ques_excel = questions.loc[i]
+        #     categorie = Categorie.objects.get(nom= ques_excel["Categories"])
+        #     question = Question(html=ques_excel["Questions"], categorie= categorie)
+        #     question.save()
+        #     good_answer = int(ques_excel['Bonne_reponse'][-1])
 
-            for i in range(1, len(questions)+1):
-                ques_excel = questions.loc[i]
-                categorie = Categorie.objects.get(nom= ques_excel["Categories"])
-                question = Question(html=ques_excel["Questions"], categorie= categorie)
-                question.save()
-                good_answer = int(ques_excel['Bonne_reponse'][-1])
-
-                for j in range(4):
-                    if j == good_answer-1:
-                        choice = Choice(html=ques_excel[f"Opt{j+1}"],question=question,is_correct= True)
-                        choice.save()
-                    else:
-                        choice = Choice(html=ques_excel[f"Opt{j+1}"],question=question)
-                        choice.save()
-            return redirect('home') 
-        else :
-            return Http404("Formulaire non valide")
+        #     for j in range(4):
+        #         if j == good_answer-1:
+        #             choice = Choice(html=ques_excel[f"Opt{j+1}"],question=question,is_correct= True)
+        #             choice.save()
+        #         else:
+        #             choice = Choice(html=ques_excel[f"Opt{j+1}"],question=question)
+        #             choice.save()
+        return redirect('home') 
+        
     else:
         form = AddWithExcel()
         context = {'form':form}
@@ -220,15 +218,19 @@ def no_choice_selected(request, id_parcours):
 def recommandation(request):
     recommender_engine= Recommender(sim_options=SIM_OPTION)
     quiz = QuizProfile.objects.filter(user_id=1).distinct('parcours')
-    categories = []
     last_quiz = []
-
     list_of_recommandation = {
         'critique':[],
         'amelioration':[],
     }
+
+    list_length={
+        'critique':0,
+        'amelioration':0,
+    }
+
     for elt in quiz:
-        id_elt =elt.id
+        id_elt =elt.parcours.id
         tmp =QuizProfile.objects.filter(parcours= id_elt).latest('completed')
         last_quiz.append(tmp)
 
@@ -236,18 +238,27 @@ def recommandation(request):
     recommender_engine.train_recommenders(request.user.id)
     
     for quizprofile in last_quiz:
-        for categorie in quizprofile.parcour.categorie.all():
-            tmp = round(recommender_engine.predict(quizprofile.id, categorie.nom)*100)
+        for categorie in quizprofile.parcours.categorie.all():
+            tmp = round(recommender_engine.make_prediction(quizprofile.id, categorie.nom)*100)
+            tuto = Tutorial.objects.get(categorie_id= categorie.id)
+            print(f"tmp {tmp} categorie{categorie.nom}")
             if tmp > 60:
-                list_of_recommandation['critique'].append(categorie.nom)
-            elif tmp > 20:
-                list_of_recommandation['amelioration'].append(categorie.nom)
-            
+                
+                list_of_recommandation['critique'].append(tuto)
+                
+            elif tmp > 30:
+                
+                list_of_recommandation['amelioration'].append(tuto)
 
+    list_length['critique'] =len( list_of_recommandation['critique'])
+    list_length['amelioration'] =len( list_of_recommandation['amelioration'])
+   
     context ={
         'recommandations': list_of_recommandation,
+        'length': list_length,
     }
-    return render(request, 'quiz/leaderboard.html', context)
+    return render(request, 'quiz/recommandation.html', context)
+
 # API Views 
 class QuestionView(APIView):
 
