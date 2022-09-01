@@ -108,7 +108,7 @@ def login_view(request):
         password = form.cleaned_data.get("password")
         user = authenticate(username=username, password=password)
         login(request, user)
-        return redirect('/user-home')
+        return redirect('home')
     return render(request, 'quiz/login.html', {"form": form, "title": title})
 
 
