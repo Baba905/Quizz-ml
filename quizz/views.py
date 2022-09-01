@@ -26,7 +26,7 @@ def home(request):
 def user_home(request, id_domaine):
     parcours = Parcours.objects.filter(domaine_id=id_domaine)
     context = {'liste_parcours': parcours}
-    return render(request, 'quiz/home.html', context=context)
+    return render(request, 'quiz/user_home.html', context=context)
 
 
 def leaderboard(request):
