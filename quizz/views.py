@@ -217,7 +217,7 @@ def no_choice_selected(request, id_parcours):
 
 def recommandation(request):
     recommender_engine= Recommender(sim_options=SIM_OPTION)
-    quiz = QuizProfile.objects.filter(user_id=1).distinct('parcours')
+    quiz = QuizProfile.objects.filter(user_id=request.user.id).distinct('parcours')
     last_quiz = []
     list_of_recommandation = {
         'critique':[],
